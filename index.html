@@ -38,6 +38,26 @@
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
+    .controls {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .controls button {
+      background: #0f172a;
+      border: 1px solid #1f2a44;
+      color: #cdefff;
+      padding: 8px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .thinking .orb { filter: hue-rotate(20deg) brightness(1.05); }
+    .thinking #mouth { stroke: #ffd66e; }
+    .thinking #eye-left, .thinking #eye-right { fill: #ffe9b1; }
+    .thinking #thought-ring { opacity: 0.9; }
+
     @keyframes pulse {
       0%, 100% { transform: scale(1); opacity: .65; }
       50% { transform: scale(1.08); opacity: .95; }
@@ -58,6 +78,11 @@
 </head>
 <body>
   <div class="wrap">
+    <div class="controls">
+      <button id="toggleMic">Enable Mic реактив</button>
+      <button id="toggleThinking">Toggle Thinking</button>
+      <button id="testNotif">Test Notification</button>
+    </div>
     <svg class="orb" viewBox="0 0 320 320" role="img" aria-label="Alfred signal orb">
       <defs>
         <radialGradient id="g1" cx="50%" cy="40%" r="60%">
@@ -78,23 +103,113 @@
         </filter>
       </defs>
 
-      <g style="animation: float 4.5s ease-in-out infinite; transform-origin: 50% 50%;">
-        <circle cx="160" cy="160" r="140" fill="none" stroke="var(--ring)" stroke-width="3" opacity="0.5" style="animation: pulse 3.5s ease-in-out infinite; transform-origin: 50% 50%;"/>
-        <circle cx="160" cy="160" r="120" fill="none" stroke="var(--ring)" stroke-width="2" opacity="0.35" style="animation: pulse 3.5s ease-in-out infinite 0.4s; transform-origin: 50% 50%;"/>
-        <circle cx="160" cy="160" r="92" fill="url(#g1)" filter="url(#glow)"/>
-        <circle cx="160" cy="160" r="110" fill="url(#g2)"/>
-        <g style="animation: bob 2.2s ease-in-out infinite; transform-origin: 50% 50%;">
-          <g style="transform-origin: 130px 150px; animation: blink 5.5s ease-in-out infinite;">
+      <g id="floatGroup" style="animation: float 4.5s ease-in-out infinite; transform-origin: 50% 50%;">
+        <circle id="ring1" cx="160" cy="160" r="140" fill="none" stroke="var(--ring)" stroke-width="3" opacity="0.5" style="animation: pulse 3.5s ease-in-out infinite; transform-origin: 50% 50%;"/>
+        <circle id="ring2" cx="160" cy="160" r="120" fill="none" stroke="var(--ring)" stroke-width="2" opacity="0.35" style="animation: pulse 3.5s ease-in-out infinite 0.4s; transform-origin: 50% 50%;"/>
+        <circle id="thought-ring" cx="160" cy="160" r="155" fill="none" stroke="#ffe08a" stroke-width="2" opacity="0" style="animation: pulse 2.2s ease-in-out infinite; transform-origin: 50% 50%;"/>
+        <circle id="orb" cx="160" cy="160" r="92" fill="url(#g1)" filter="url(#glow)"/>
+        <circle id="glow" cx="160" cy="160" r="110" fill="url(#g2)"/>
+        <g id="face" style="animation: bob 2.2s ease-in-out infinite; transform-origin: 50% 50%;">
+          <g id="eye-left" style="transform-origin: 130px 150px; animation: blink 5.5s ease-in-out infinite;">
             <ellipse cx="130" cy="150" rx="8" ry="10" fill="var(--eye)"/>
           </g>
-          <g style="transform-origin: 190px 150px; animation: blink 5.2s ease-in-out infinite 0.2s;">
+          <g id="eye-right" style="transform-origin: 190px 150px; animation: blink 5.2s ease-in-out infinite 0.2s;">
             <ellipse cx="190" cy="150" rx="8" ry="10" fill="var(--eye)"/>
           </g>
-          <path d="M140 190 Q160 205 180 190" fill="none" stroke="var(--mouth)" stroke-width="5" stroke-linecap="round"/>
+          <path id="mouth" d="M140 190 Q160 205 180 190" fill="none" stroke="var(--mouth)" stroke-width="5" stroke-linecap="round"/>
         </g>
       </g>
     </svg>
     <div class="label">Alfred — Signal Orb</div>
   </div>
+
+  <script>
+    const root = document.documentElement;
+    const wrap = document.querySelector('.wrap');
+    const orb = document.getElementById('orb');
+    const ring1 = document.getElementById('ring1');
+    const ring2 = document.getElementById('ring2');
+    const mouth = document.getElementById('mouth');
+
+    // Mouse/touch reaction
+    const onMove = (x, y) => {
+      const rect = orb.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = (x - cx) / rect.width;
+      const dy = (y - cy) / rect.height;
+      const tiltX = Math.max(-8, Math.min(8, dx * 20));
+      const tiltY = Math.max(-8, Math.min(8, dy * 20));
+      orb.parentElement.style.transform = `translate(${tiltX}px, ${tiltY}px)`;
+    };
+    window.addEventListener('mousemove', e => onMove(e.clientX, e.clientY));
+    window.addEventListener('touchmove', e => {
+      if (e.touches?.[0]) onMove(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+
+    // Mic/audio reaction
+    let audioCtx, analyser, dataArray, micActive = false;
+    const toggleMicBtn = document.getElementById('toggleMic');
+    toggleMicBtn.addEventListener('click', async () => {
+      try {
+        if (!micActive) {
+          const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+          const source = audioCtx.createMediaStreamSource(stream);
+          analyser = audioCtx.createAnalyser();
+          analyser.fftSize = 256;
+          dataArray = new Uint8Array(analyser.frequencyBinCount);
+          source.connect(analyser);
+          micActive = true;
+          toggleMicBtn.textContent = 'Mic: On';
+          animateAudio();
+        } else {
+          micActive = false;
+          toggleMicBtn.textContent = 'Enable Mic реактив';
+        }
+      } catch (err) {
+        alert('Mic permission needed to react to audio.');
+      }
+    });
+
+    function animateAudio() {
+      if (!micActive) return;
+      analyser.getByteFrequencyData(dataArray);
+      const avg = dataArray.reduce((a,b)=>a+b,0)/dataArray.length;
+      const scale = 1 + Math.min(avg/512, 0.25);
+      orb.style.transform = `scale(${scale})`;
+      ring1.style.opacity = Math.min(1, 0.4 + avg/512);
+      ring2.style.opacity = Math.min(0.9, 0.2 + avg/700);
+      requestAnimationFrame(animateAudio);
+    }
+
+    // Thinking state (task status)
+    const toggleThinkingBtn = document.getElementById('toggleThinking');
+    toggleThinkingBtn.addEventListener('click', () => {
+      document.body.classList.toggle('thinking');
+    });
+
+    // Notification reaction
+    const testNotifBtn = document.getElementById('testNotif');
+    testNotifBtn.addEventListener('click', async () => {
+      if (!('Notification' in window)) return alert('Notifications not supported.');
+      if (Notification.permission !== 'granted') {
+        await Notification.requestPermission();
+      }
+      if (Notification.permission === 'granted') {
+        new Notification('Alfred', { body: 'Signal received.' });
+        blinkReaction();
+      }
+    });
+
+    function blinkReaction() {
+      mouth.setAttribute('d', 'M140 190 Q160 180 180 190');
+      setTimeout(()=> mouth.setAttribute('d', 'M140 190 Q160 205 180 190'), 400);
+    }
+
+    // Optional: set thinking via URL param ?thinking=1
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('thinking') === '1') document.body.classList.add('thinking');
+  </script>
 </body>
 </html>
