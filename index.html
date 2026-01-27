@@ -57,6 +57,7 @@
     .thinking #mouth { stroke: #ffd66e; }
     .thinking #eye-left, .thinking #eye-right { fill: #ffe9b1; }
     .thinking #thought-ring { opacity: 0.9; }
+    .thinking #brow { stroke: #ffe9b1; transform: translateY(-6px); }
 
     @keyframes pulse {
       0%, 100% { transform: scale(1); opacity: .65; }
@@ -110,6 +111,7 @@
         <circle id="orb" cx="160" cy="160" r="92" fill="url(#g1)" filter="url(#glow)"/>
         <circle id="glow" cx="160" cy="160" r="110" fill="url(#g2)"/>
         <g id="face" style="animation: bob 2.2s ease-in-out infinite; transform-origin: 50% 50%;">
+          <path id="brow" d="M118 138 Q130 130 142 138" fill="none" stroke="#cbefff" stroke-width="4" stroke-linecap="round"/>
           <g id="eye-left" style="transform-origin: 130px 150px; animation: blink 5.5s ease-in-out infinite;">
             <ellipse cx="130" cy="150" rx="8" ry="10" fill="var(--eye)"/>
           </g>
