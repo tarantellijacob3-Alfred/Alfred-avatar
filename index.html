@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alfred — Signal Orb</title>
+  <style>
+    :root {
+      --bg: #0b0f1a;
+      --orb: #0fd3ff;
+      --orb-soft: rgba(15,211,255,0.35);
+      --ring: rgba(122, 236, 255, 0.7);
+      --eye: #e6fbff;
+      --mouth: #b9f4ff;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      background: var(--bg);
+      display: grid;
+      place-items: center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: #cdefff;
+    }
+    .wrap {
+      display: grid;
+      place-items: center;
+      gap: 16px;
+    }
+    .orb {
+      width: 320px;
+      height: 320px;
+    }
+    .label {
+      opacity: 0.75;
+      font-size: 14px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: .65; }
+      50% { transform: scale(1.08); opacity: .95; }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+    @keyframes blink {
+      0%, 92%, 100% { transform: scaleY(1); }
+      95% { transform: scaleY(0.1); }
+    }
+    @keyframes bob {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(3px); }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <svg class="orb" viewBox="0 0 320 320" role="img" aria-label="Alfred signal orb">
+      <defs>
+        <radialGradient id="g1" cx="50%" cy="40%" r="60%">
+          <stop offset="0%" stop-color="#79ecff" stop-opacity="0.95"/>
+          <stop offset="60%" stop-color="#0fd3ff" stop-opacity="0.85"/>
+          <stop offset="100%" stop-color="#007aa6" stop-opacity="0.9"/>
+        </radialGradient>
+        <radialGradient id="g2" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#dffbff" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#0fd3ff" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="8" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+
+      <g style="animation: float 4.5s ease-in-out infinite; transform-origin: 50% 50%;">
+        <circle cx="160" cy="160" r="140" fill="none" stroke="var(--ring)" stroke-width="3" opacity="0.5" style="animation: pulse 3.5s ease-in-out infinite; transform-origin: 50% 50%;"/>
+        <circle cx="160" cy="160" r="120" fill="none" stroke="var(--ring)" stroke-width="2" opacity="0.35" style="animation: pulse 3.5s ease-in-out infinite 0.4s; transform-origin: 50% 50%;"/>
+        <circle cx="160" cy="160" r="92" fill="url(#g1)" filter="url(#glow)"/>
+        <circle cx="160" cy="160" r="110" fill="url(#g2)"/>
+        <g style="animation: bob 2.2s ease-in-out infinite; transform-origin: 50% 50%;">
+          <g style="transform-origin: 130px 150px; animation: blink 5.5s ease-in-out infinite;">
+            <ellipse cx="130" cy="150" rx="8" ry="10" fill="var(--eye)"/>
+          </g>
+          <g style="transform-origin: 190px 150px; animation: blink 5.2s ease-in-out infinite 0.2s;">
+            <ellipse cx="190" cy="150" rx="8" ry="10" fill="var(--eye)"/>
+          </g>
+          <path d="M140 190 Q160 205 180 190" fill="none" stroke="var(--mouth)" stroke-width="5" stroke-linecap="round"/>
+        </g>
+      </g>
+    </svg>
+    <div class="label">Alfred — Signal Orb</div>
+  </div>
+</body>
+</html>
