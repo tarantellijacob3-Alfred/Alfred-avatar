@@ -6,12 +6,12 @@
   <title>Alfred — Signal Orb</title>
   <style>
     :root {
-      --bg: #0b0f1a;
-      --orb: #0fd3ff;
-      --orb-soft: rgba(15,211,255,0.35);
-      --ring: rgba(122, 236, 255, 0.7);
-      --eye: #e6fbff;
-      --mouth: #b9f4ff;
+      --bg: #0a0f14;
+      --orb: #5eead4;
+      --orb-soft: rgba(94,234,212,0.35);
+      --ring: rgba(148, 163, 184, 0.6);
+      --eye: #f8fafc;
+      --mouth: #d1fae5;
     }
     html, body {
       width: 100%;
@@ -54,10 +54,10 @@
       font-size: 12px;
     }
     .thinking .orb { filter: hue-rotate(20deg) brightness(1.05); }
-    .thinking #mouth { stroke: #ffd66e; }
-    .thinking #eye-left, .thinking #eye-right { fill: #ffe9b1; }
-    .thinking #thought-ring { opacity: 0.9; }
-    .thinking #brow-left { stroke: #ffe9b1; transform: translateY(-6px); }
+    .thinking #mouth { stroke: #fde68a; }
+    .thinking #eye-left, .thinking #eye-right { fill: #fef3c7; }
+    .thinking #thought-ring { opacity: 0.9; stroke: #fef3c7; }
+    .thinking #brow-left { stroke: #fef3c7; transform: translateY(-6px); }
 
     @keyframes pulse {
       0%, 100% { transform: scale(1); opacity: .65; }
@@ -86,13 +86,13 @@
     <svg class="orb" viewBox="0 0 320 320" role="img" aria-label="Alfred signal orb">
       <defs>
         <radialGradient id="g1" cx="50%" cy="40%" r="60%">
-          <stop offset="0%" stop-color="#79ecff" stop-opacity="0.95"/>
-          <stop offset="60%" stop-color="#0fd3ff" stop-opacity="0.85"/>
-          <stop offset="100%" stop-color="#007aa6" stop-opacity="0.9"/>
+          <stop offset="0%" stop-color="#99f6e4" stop-opacity="0.95"/>
+          <stop offset="60%" stop-color="#5eead4" stop-opacity="0.85"/>
+          <stop offset="100%" stop-color="#0f766e" stop-opacity="0.9"/>
         </radialGradient>
         <radialGradient id="g2" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#dffbff" stop-opacity="0.9"/>
-          <stop offset="100%" stop-color="#0fd3ff" stop-opacity="0"/>
+          <stop offset="0%" stop-color="#ecfeff" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#5eead4" stop-opacity="0"/>
         </radialGradient>
         <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
           <feGaussianBlur stdDeviation="8" result="blur"/>
