@@ -2,10 +2,21 @@ import http from "http";
 import fs from "fs";
 
 const PORT = process.env.PORT || 7070;
-const API_KEY = process.env.OPENAI_API_KEY;
+let API_KEY = process.env.OPENAI_API_KEY;
+
+if (!API_KEY && fs.existsSync('.env')) {
+  const env = fs.readFileSync('.env', 'utf8');
+  for (const line of env.split(/\r?\n/)) {
+    const m = line.match(/^\s*OPENAI_API_KEY\s*=\s*(.+)\s*$/);
+    if (m) {
+      API_KEY = m[1].replace(/^"|"$/g, '').replace(/^'|'$/g, '');
+      break;
+    }
+  }
+}
 
 if (!API_KEY) {
-  console.error("Missing OPENAI_API_KEY in env.");
+  console.error("Missing OPENAI_API_KEY in env or .env file.");
   process.exit(1);
 }
 
