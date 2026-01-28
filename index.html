@@ -81,6 +81,7 @@
   <div class="wrap">
     <div class="controls">
       <button id="toggleMic">Enable Mic Reactive</button>
+      <button id="talkBtn">Talk (Local TTS)</button>
       <button id="testNotif">Test Notification</button>
     </div>
     <svg class="orb" viewBox="0 0 320 320" role="img" aria-label="Alfred signal orb">
@@ -190,6 +191,25 @@
     window.addEventListener('message', (event) => {
       if (event?.data?.type === 'thinking') {
         document.body.classList.toggle('thinking', !!event.data.value);
+      }
+    });
+
+    // Local TTS (OpenAI voice via localhost proxy)
+    const talkBtn = document.getElementById('talkBtn');
+    talkBtn.addEventListener('click', async () => {
+      try {
+        const res = await fetch('http://localhost:7070/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: 'Hey Jacob. I am online and ready to help.' })
+        });
+        if (!res.ok) throw new Error('TTS failed');
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        const audio = new Audio(url);
+        audio.play();
+      } catch (e) {
+        alert('Local TTS server not running. Start local-voice-server.js');
       }
     });
 
